@@ -13,6 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Cache dbt Installation
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: dbt-install-${{ runner.os }}
+
       - name: Run dbt commands
         run: |
           dbt debug
