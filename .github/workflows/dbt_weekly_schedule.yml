@@ -1,4 +1,4 @@
-name: Scheduled dbt Run
+name: Weekly DBT Job
 
 on:
   schedule:
