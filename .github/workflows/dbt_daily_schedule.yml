@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir -p ~/.dbt
           echo "
-          dbt_project:
+          dbt_assignment_2:
             outputs:
               dev:
                 type: snowflake
