@@ -23,6 +23,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.9.2 dbt-snowflake==1.9.1
 
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          echo "
+          dbt_assignment_2:
+            outputs:
+              dev:
+                type: snowflake
+                account: ${{ secrets.DBT_ACCOUNT }}
+                user: ${{ secrets.DBT_USER }}
+                password: ${{ secrets.DBT_PASSWORD }}
+                role: ${{ secrets.DBT_ROLE }}
+                warehouse: ${{ secrets.DBT_WAREHOUSE }}
+                database: ${{ secrets.DBT_DATABASE }}
+                schema: ${{ secrets.DBT_SCHEMA }}
+                threads: 4
+            target: dev
+          " > ~/.dbt/profiles.yml
+
       - name: Run dbt commands
         run: |
           dbt debug
