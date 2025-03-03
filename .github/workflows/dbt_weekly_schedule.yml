@@ -1,0 +1,21 @@
+name: Weekly DBT Job
+
+on:
+  schedule:
+    - cron: "0 4 * * 0" # Runs every Sunday at 4 AM UTC
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run dbt commands
+        run: |
+          dbt debug
+          dbt deps
+          dbt compile
+          dbt run --full-refresh

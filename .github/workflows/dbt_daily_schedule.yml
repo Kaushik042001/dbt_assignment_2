@@ -1,0 +1,21 @@
+name: Daily DBT Job
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # Runs every day at 5 AM UTC
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  dbt-compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run dbt commands
+        run: |
+          dbt debug
+          dbt deps
+          dbt compile
+          dbt build
