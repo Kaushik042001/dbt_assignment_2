@@ -33,3 +33,7 @@ models:
     +materialized: view
     src:
       +materialized: view
+    intermediate:
+      +materialized: view
+    final:
+      +materialized: table

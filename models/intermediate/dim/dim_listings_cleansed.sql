@@ -10,12 +10,16 @@ WITH raw_listings AS (
         END AS room_type,
         minimum_nights,
         host_id,
-        TRY_CAST(REPLACE(price_str, '$', '') AS NUMBER) AS price,
+
+        -- Clean price_str by removing non-numeric characters
+        TRY_CAST(REGEXP_REPLACE(price_str, '[^0-9.]', '') AS NUMBER) AS price,
+
         created_at,  
         updated_at   
     FROM {{ ref("src_listings") }}
-    WHERE listing_url IS NOT NULL  -- Remove rows where listing_url is null
-    AND price_str IS NOT NULL      -- Remove rows where price_str is null
+    WHERE listing_url IS NOT NULL  
+    AND price_str IS NOT NULL  -- Remove rows where price_str is null
+    AND price_str != ''        -- Remove empty strings
 ) 
 
 SELECT * FROM raw_listings

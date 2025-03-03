@@ -1,0 +1,282 @@
+version: 2
+
+models:
+  - name: dim_hosts_cleansed
+    description: "Cleaned and transformed hosts data."
+    columns:
+      - name: host_id
+        description: "Unique identifier for each host."
+        tests:
+          - not_null
+
+      - name: host_name
+        description: "Name of the host."
+        tests:
+          - not_null
+
+      - name: is_superhost
+        description: "Indicates if the host is a superhost (t/f/unknown)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["t", "f", "unknown"]
+
+      - name: created_at
+        description: "Timestamp when the host was created."
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: "Timestamp when the host data was last updated."
+        tests:
+          - not_null
+
+  - name: ranked_hosts
+    description: "Retrieves the latest record for each host based on the most recent created_at timestamp."
+    columns:
+      - name: host_id
+        description: "Unique identifier for the host."
+        tests:
+          - not_null
+          - unique
+
+      - name: host_name
+        description: "Name of the host."
+
+      - name: is_superhost
+        description: "Indicates whether the host is a superhost (true/false/unknown)."
+
+      - name: created_at
+        description: "Timestamp when the host was first created."
+
+      - name: updated_at
+        description: "Timestamp when the host details were last updated."
+
+      - name: rn
+        description: "Row number assigned based on the latest created_at timestamp per host."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1] # Ensures only the latest record for each host is selected.
+
+  - name: dim_listings_cleansed
+    description: "Cleaned and transformed listings data."
+    columns:
+      - name: listing_id
+        description: "Unique identifier for each listing."
+        tests:
+          - not_null
+          - unique
+
+      - name: listing_name
+        description: "Name of the listing."
+        tests:
+          - not_null
+
+      - name: room_type
+        description: "Type of room for the listing."
+        tests:
+          - accepted_values:
+              values:
+                - "Private room"
+                - "Entire home/apt"
+                - "Shared room"
+                - "Hotel room"
+                - "unknown"
+
+      - name: minimum_nights
+        description: "Minimum number of nights required for booking."
+        tests:
+          - not_null
+
+      - name: price
+        description: "Price per night for the listing."
+        tests:
+          - not_null
+
+      - name: host_id
+        description: "Foreign key from hosts"
+        tests:
+          - not_null
+
+      - name: created_at
+        description: "Timestamp when the listing was created."
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: "Timestamp when the listing data was last updated."
+        tests:
+          - not_null
+
+  - name: dim_reviews_cleansed
+    description: "Cleaned and transformed reviews data."
+    columns:
+      - name: listing_id
+        description: "Identifier for the listing being reviewed."
+        tests:
+          - not_null
+          - unique
+
+      - name: review_date
+        description: "Date of the review."
+        tests:
+          - not_null
+
+      - name: reviewer_name
+        description: "Name of the reviewer."
+        tests:
+          - not_null
+
+      - name: review_sentiment
+        description: "Sentiment score of the review, rounded to an integer."
+        tests:
+          - not_null
+
+  - name: count_hosts_by_month_year
+    description: "Fact table showing the number of hosts created per month for each year."
+    columns:
+      - name: month_name
+        description: "Name of the month in which hosts were created."
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - "Jan"
+                - "Feb"
+                - "Mar"
+                - "Apr"
+                - "May"
+                - "Jun"
+                - "Jul"
+                - "Aug"
+                - "Sep"
+                - "Oct"
+                - "Nov"
+                - "Dec"
+
+      - name: host_count
+        description: "Total number of hosts created in the given month."
+        tests:
+          - not_null
+
+      - name: year
+        description: "Year corresponding to the data in the table."
+        tests:
+          - not_null
+
+  - name: price_metrics
+    description: "Fact table displaying price metrics (average price and total price) grouped by listing name."
+    columns:
+      - name: listing_name
+        description: "Name of the listing."
+        tests:
+          - not_null
+
+      - name: avg_price
+        description: "Average price of the listing."
+        tests:
+          - not_null
+
+      - name: total_price
+        description: "Total price calculated for the listing."
+        tests:
+          - not_null
+
+  - name: review_aggregates
+    description: "Aggregated review metrics for Airbnb listings, including total reviews, average sentiment, and latest review date."
+    columns:
+      - name: listing_id
+        description: "Unique identifier for the listing."
+        tests:
+          - not_null
+          - unique
+
+      - name: total_reviews
+        description: "Total number of reviews for the listing."
+
+      - name: avg_review_sentiment
+        description: "Average sentiment score of reviews for the listing."
+
+      - name: latest_review_date
+        description: "Most recent review date for the listing."
+
+  - name: final_airbnb_listings
+    description: "Final consolidated Airbnb listings model combining listings, hosts, and reviews."
+    columns:
+      - name: listing_id
+        description: "Unique identifier for the listing."
+        tests:
+          - not_null
+
+      - name: listing_url
+        description: "URL of the listing on Airbnb."
+
+      - name: listing_name
+        description: "Name of the Airbnb listing."
+
+      - name: room_type
+        description: "Type of room (Private room, Entire home/apt, Shared room, Hotel room)."
+
+      - name: minimum_nights
+        description: "Minimum nights required for booking."
+
+      - name: price
+        description: "Nightly price of the listing."
+
+      - name: created_at
+        description: "Creation date of the listing."
+
+      - name: updated_at
+        description: "Last update timestamp of the listing."
+
+      - name: host_id
+        description: "Unique identifier for the host."
+
+      - name: host_name
+        description: "Name of the host."
+
+      - name: is_superhost
+        description: "Indicates whether the host is a Superhost (t/f)."
+
+      - name: host_since
+        description: "Date when the host joined the platform."
+
+      - name: host_updated
+        description: "Last update timestamp for host details."
+
+      - name: review_date
+        description: "Date of the review."
+
+      - name: reviewer_name
+        description: "Name of the reviewer."
+
+      - name: review_text
+        description: "Text content of the review."
+
+      - name: review_sentiment
+        description: "Sentiment score of the review (rounded integer value)."
+
+  - name: average_nightly_rate
+    description: "Calculates the average nightly rate for Airbnb listings by dividing total price by available nights."
+    columns:
+      - name: listing_id
+        description: "Unique identifier for the listing."
+        tests:
+          - not_null
+          - unique
+
+      - name: listing_name
+        description: "Name of the listing."
+
+      - name: listing_count
+        description: "Total number of listings available."
+
+      - name: total_price
+        description: "Total price accumulated for the listing."
+
+      - name: available_nights
+        description: "Number of nights the listing is available."
+
+      - name: average_nightly_rate
+        description: "Computed as total_price divided by available_nights. NULL if available_nights is zero."
