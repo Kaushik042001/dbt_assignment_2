@@ -26,6 +26,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core dbt-snowflake  # Adjust based on your warehouse
 
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          echo "
+          my_project:
+            outputs:
+              dev:
+                type: snowflake
+                account: ${{ secrets.DBT_ACCOUNT }}
+                user: ${{ secrets.DBT_USER }}
+                password: ${{ secrets.DBT_PASSWORD }}
+                role: ${{ secrets.DBT_ROLE }}
+                warehouse: ${{ secrets.DBT_WAREHOUSE }}
+                database: ${{ secrets.DBT_DATABASE }}
+                schema: ${{ secrets.DBT_SCHEMA }}
+                threads: 4
+            target: dev
+          " > ~/.dbt/profiles.yml
+
       - name: Run dbt commands
         run: |
           dbt debug
