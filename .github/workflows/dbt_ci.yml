@@ -45,14 +45,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.9.2 dbt-snowflake==1.9.1
 
-      - name: Cache dbt dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: dbt-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            dbt-cache-${{ runner.os }}-
-
       - name: Run dbt commands
         run: |
           dbt debug

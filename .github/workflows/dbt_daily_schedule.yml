@@ -6,18 +6,15 @@ on:
   workflow_dispatch: # Allows manual trigger
 
 jobs:
+  dbt-run:
+    uses: ./.github/workflows/setup-dbt.yml # Calls setup workflow
+
   dbt-compile:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Cache dbt Installation
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: dbt-install-${{ runner.os }}
 
       - name: Run dbt commands
         run: |
