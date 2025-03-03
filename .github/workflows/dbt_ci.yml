@@ -16,6 +16,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<EOL
+          dbt_assignment_2:
+            outputs:
+              dev:
+                type: snowflake
+                account: "${{ secrets.DBT_ACCOUNT }}"
+                user: "${{ secrets.DBT_USER }}"
+                password: "${{ secrets.DBT_PASSWORD }}"
+                role: "${{ secrets.DBT_ROLE }}"
+                warehouse: "${{ secrets.DBT_WAREHOUSE }}"
+                database: "${{ secrets.DBT_DATABASE }}"
+                schema: "${{ secrets.DBT_SCHEMA }}"
+                threads: 4
+            target: dev
+          EOL
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -24,26 +43,7 @@ jobs:
       - name: Install dbt
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core dbt-snowflake  # Adjust based on your warehouse
-
-      - name: Create profiles.yml
-        run: |
-          mkdir -p ~/.dbt
-          echo "
-          my_project:
-            outputs:
-              dev:
-                type: snowflake
-                account: ${{ secrets.DBT_ACCOUNT }}
-                user: ${{ secrets.DBT_USER }}
-                password: ${{ secrets.DBT_PASSWORD }}
-                role: ${{ secrets.DBT_ROLE }}
-                warehouse: ${{ secrets.DBT_WAREHOUSE }}
-                database: ${{ secrets.DBT_DATABASE }}
-                schema: ${{ secrets.DBT_SCHEMA }}
-                threads: 4
-            target: dev
-          " > ~/.dbt/profiles.yml
+          pip install dbt-core==1.9.2 dbt-snowflake==1.9.2  # Adjust version if needed
 
       - name: Run dbt commands
         run: |
@@ -51,3 +51,11 @@ jobs:
           dbt deps
           dbt compile
           dbt run
+
+      - name: Run dbt tests
+        run: |
+          dbt test  # Runs tests on models
+
+      - name: Run dbt build
+        run: |
+          dbt build  # Runs models + tests + snapshots
