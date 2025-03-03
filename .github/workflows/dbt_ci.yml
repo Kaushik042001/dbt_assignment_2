@@ -43,7 +43,7 @@ jobs:
       - name: Install dbt
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.2 dbt-snowflake==1.9.2  # Adjust version if needed
+          pip install dbt-core==1.9.2 dbt-snowflake==1.9.1  # Use 1.9.1 for dbt-snowflake
 
       - name: Run dbt commands
         run: |
