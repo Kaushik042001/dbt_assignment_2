@@ -6,12 +6,12 @@ on:
   workflow_dispatch: # Allows manual trigger
 
 jobs:
-  dbt-run:
-    uses: ./.github/workflows/setup-dbt.yml # Calls setup workflow
+  setup-dbt:
+    uses: ./.github/workflows/setup-dbt.yml # Reuses the setup workflow
 
   dbt-compile:
     runs-on: ubuntu-latest
-
+    needs: setup-dbt # Ensures dbt is installed before running
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

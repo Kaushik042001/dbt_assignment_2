@@ -1,27 +1,36 @@
 name: Setup dbt
 
 on:
-  workflow_call: # Allows other workflows to reuse this setup
+  workflow_call: # Allows this to be reused in other workflows
+    outputs:
+      cache-key:
+        description: "Cache key for dbt installation"
+        value: ${{ steps.cache-key.outputs.cache-hit }}
 
 jobs:
   setup-dbt:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Install dbt
-        run: |
-          python -m pip install --upgrade pip
-          pip install dbt-core==1.9.2 dbt-snowflake==1.9.1  # Modify adapter if needed
-
       - name: Cache dbt Installation
+        id: cache-key
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: dbt-install-${{ runner.os }}
+
+      - name: Install dbt
+        if: steps.cache-key.outputs.cache-hit != 'true' # Only installs if cache is not available
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.2 dbt-snowflake==1.9.1
+
+      - name: Verify dbt installation
+        run: |
+          which dbt
+          dbt --version
+          pip list | grep dbt
