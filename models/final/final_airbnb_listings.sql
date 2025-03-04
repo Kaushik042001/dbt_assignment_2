@@ -1,3 +1,10 @@
+{{ 
+  config(
+    cluster_by=['listing_id', 'host_since']  
+  ) 
+}}
+
+
 WITH final_airbnb_listings AS (
     SELECT 
         l.listing_id,
@@ -8,7 +15,7 @@ WITH final_airbnb_listings AS (
         l.price,
         l.created_at,
         l.updated_at,
-        H.host_id,
+        h.host_id,
         h.host_name,
         h.is_superhost,
         h.created_at AS host_since,

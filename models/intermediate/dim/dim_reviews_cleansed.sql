@@ -1,3 +1,5 @@
+
+
 WITH raw_reviews AS ( 
     SELECT 
         listing_id,
@@ -12,3 +14,5 @@ WITH raw_reviews AS (
 ) 
 
 SELECT * FROM raw_reviews
+
+

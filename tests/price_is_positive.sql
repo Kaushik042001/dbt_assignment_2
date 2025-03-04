@@ -1,0 +1,1 @@
+SELECT * FROM {{ref("dim_listings_cleansed")}} WHERE price IS NULL OR price < 0 

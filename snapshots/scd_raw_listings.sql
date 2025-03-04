@@ -1,4 +1,4 @@
-{% snapshot listings_snapshot %}
+{% snapshot raw_listings_snapshot %}
 
 {{
     config(

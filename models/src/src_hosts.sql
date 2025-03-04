@@ -1,3 +1,4 @@
+
 WITH raw_hosts AS ( 
 
     SELECT * FROM {{ source('assignment_2', 'hosts') }}

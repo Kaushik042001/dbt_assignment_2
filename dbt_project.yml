@@ -30,10 +30,26 @@ clean-targets: # directories to be removed by `dbt clean`
 
 models:
   dbt_assignment_2:
-    +materialized: view
+    models:
+  dbt_assignment_2:
+    +pre-hook:
+      - "INSERT INTO logs.execution_log (model_name, execution_time, status, run_started_at, command) 
+         VALUES ('{{ this }}', CURRENT_TIMESTAMP, 'STARTED', CURRENT_TIMESTAMP, '{{ invocation_args }}')"
+
+    +post-hook:
+      - "INSERT INTO logs.execution_log (model_name, execution_time, status, run_started_at, command) 
+         VALUES ('{{ this }}', CURRENT_TIMESTAMP, 'COMPLETED', CURRENT_TIMESTAMP, '{{ invocation_args }}')"
+
+
+    +materialized: view # Default materialization for all models in the project
+
     src:
-      +materialized: view
+      +materialized: view # All source models as views
+
     intermediate:
-      +materialized: view
+      +materialized: view # Intermediate models as views
+      dim:
+        +materializd: table
+
     final:
-      +materialized: table
+      +materialized: table # Final models as tables

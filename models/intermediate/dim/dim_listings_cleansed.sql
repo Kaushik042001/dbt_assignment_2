@@ -1,3 +1,10 @@
+{{ 
+  config( 
+    materialized = 'incremental', 
+    on_schema_change='fail' 
+    ) 
+}} 
+
 WITH raw_listings AS ( 
     SELECT 
         listing_id,
@@ -23,3 +30,7 @@ WITH raw_listings AS (
 ) 
 
 SELECT * FROM raw_listings
+
+{% if is_incremental() %} 
+  AND updated_at > (select max(updated_at) from {{ this }}) 
+{% endif %}

@@ -1,0 +1,36 @@
+exposures:
+  - name: average_nightly_rate_report
+    label: "Average Nightly Rate Report"
+    type: dashboard
+    maturity: high
+    url: "https://your-dashboard-url.com/average_nightly_rate"
+    description: "This dashboard tracks the average nightly rate for Airbnb listings."
+    depends_on:
+      - ref('average_nightly_rate')
+    owner:
+      name: "Data Team"
+      email: "data-team@yourcompany.com"
+
+  - name: count_available_days_report
+    label: "Count of Available Days Report"
+    type: dashboard
+    maturity: high
+    url: "https://your-dashboard-url.com/count_available_days"
+    description: "This dashboard shows the count of available days for listings."
+    depends_on:
+      - ref('count_available_days')
+    owner:
+      name: "Data Team"
+      email: "data-team@yourcompany.com"
+
+  - name: final_airbnb_listings_dashboard
+    label: "Final Airbnb Listings Dashboard"
+    type: dashboard
+    maturity: high
+    url: "https://your-dashboard-url.com/final_airbnb_listings"
+    description: "This dashboard provides an overview of Airbnb listings with all final transformations applied."
+    depends_on:
+      - ref('final_airbnb_listings')
+    owner:
+      name: "Data Team"
+      email: "data-team@yourcompany.com"
