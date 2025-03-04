@@ -31,6 +31,34 @@ models:
         tests:
           - not_null
 
+  - name: ranked_hosts
+    description: "This model selects the most recent record for each host from dim_hosts_cleansed using ROW_NUMBER."
+    columns:
+      - name: host_id
+        description: "Unique identifier for the host."
+        tests:
+          - not_null
+          - unique
+
+      - name: host_name
+        description: "Name of the host. Defaults to 'Anonymous' if NULL."
+
+      - name: is_superhost
+        description: "Indicates whether the host is a superhost ('t' or 'f')."
+
+      - name: created_at
+        description: "Timestamp when the host profile was created."
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: "Timestamp when the host profile was last updated."
+
+      - name: rn
+        description: "Row number assigned to each host record within the partition."
+        tests:
+          - not_null
+
   - name: dim_listings_cleansed
     description: "Cleaned and transformed listings data."
     columns:
