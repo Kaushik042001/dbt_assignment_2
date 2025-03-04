@@ -3,7 +3,7 @@ exposures:
     label: "Average Nightly Rate Report"
     type: dashboard
     maturity: high
-    url: "https://your-dashboard-url.com/average_nightly_rate"
+    url: "https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112"
     description: "This dashboard tracks the average nightly rate for Airbnb listings."
     depends_on:
       - ref('average_nightly_rate')
@@ -15,7 +15,7 @@ exposures:
     label: "Count of Available Days Report"
     type: dashboard
     maturity: high
-    url: "https://your-dashboard-url.com/count_available_days"
+    url: "https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112"
     description: "This dashboard shows the count of available days for listings."
     depends_on:
       - ref('count_available_days')
@@ -27,7 +27,7 @@ exposures:
     label: "Final Airbnb Listings Dashboard"
     type: dashboard
     maturity: high
-    url: "https://your-dashboard-url.com/final_airbnb_listings"
+    url: "https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112"
     description: "This dashboard provides an overview of Airbnb listings with all final transformations applied."
     depends_on:
       - ref('final_airbnb_listings')

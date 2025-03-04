@@ -31,34 +31,6 @@ models:
         tests:
           - not_null
 
-  - name: ranked_hosts
-    description: "Retrieves the latest record for each host based on the most recent created_at timestamp."
-    columns:
-      - name: host_id
-        description: "Unique identifier for the host."
-        tests:
-          - not_null
-          - unique
-
-      - name: host_name
-        description: "Name of the host."
-
-      - name: is_superhost
-        description: "Indicates whether the host is a superhost (true/false/unknown)."
-
-      - name: created_at
-        description: "Timestamp when the host was first created."
-
-      - name: updated_at
-        description: "Timestamp when the host details were last updated."
-
-      - name: rn
-        description: "Row number assigned based on the latest created_at timestamp per host."
-        tests:
-          - not_null
-          - accepted_values:
-              values: [1] # Ensures only the latest record for each host is selected.
-
   - name: dim_listings_cleansed
     description: "Cleaned and transformed listings data."
     columns:
@@ -211,51 +183,83 @@ models:
 
       - name: listing_url
         description: "URL of the listing on Airbnb."
+        tests:
+          - not_null
 
       - name: listing_name
         description: "Name of the Airbnb listing."
+        tests:
+          - not_null
 
       - name: room_type
         description: "Type of room (Private room, Entire home/apt, Shared room, Hotel room)."
+        tests:
+          - not_null
 
       - name: minimum_nights
         description: "Minimum nights required for booking."
+        tests:
+          - not_null
 
       - name: price
         description: "Nightly price of the listing."
+        tests:
+          - not_null
 
       - name: created_at
         description: "Creation date of the listing."
+        tests:
+          - not_null
 
       - name: updated_at
         description: "Last update timestamp of the listing."
+        tests:
+          - not_null
 
       - name: host_id
         description: "Unique identifier for the host."
+        tests:
+          - not_null
 
       - name: host_name
         description: "Name of the host."
+        tests:
+          - not_null
 
       - name: is_superhost
         description: "Indicates whether the host is a Superhost (t/f)."
+        tests:
+          - not_null
 
       - name: host_since
         description: "Date when the host joined the platform."
+        tests:
+          - not_null
 
       - name: host_updated
         description: "Last update timestamp for host details."
+        tests:
+          - not_null
 
       - name: review_date
         description: "Date of the review."
+        tests:
+          - not_null
 
       - name: reviewer_name
         description: "Name of the reviewer."
+        tests:
+          - not_null
 
       - name: review_text
         description: "Text content of the review."
+        tests:
+          - not_null
 
       - name: review_sentiment
         description: "Sentiment score of the review (rounded integer value)."
+        tests:
+          - not_null
 
   - name: average_nightly_rate
     description: "Calculates the average nightly rate for Airbnb listings by dividing total price by available nights."
