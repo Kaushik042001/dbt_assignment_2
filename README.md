@@ -470,70 +470,191 @@ The workflows ensure **continuous integration (CI/CD), scheduled daily execution
 
 ---
 
-# **📌 1. CI/CD Pipeline for DBT**
+# **DBT CI/CD Pipeline**
 
-## **🔹 Overview**
+## **Overview**
 
-This **CI/CD pipeline** triggers **DBT execution** whenever:
+This GitHub Actions workflow automates the Continuous Integration (CI) process for a dbt project using Snowflake as the data warehouse. The workflow runs on every push and pull request to the `main` branch, ensuring that dbt models, tests, and builds are validated before deployment.
 
-- A **push** is made to the `main` branch.
-- A **pull request** is opened or updated on the `main` branch.
+## **Workflow Trigger**
 
-## **🔹 Workflow Summary**
+- **Push to `main` branch**: Runs when new commits are pushed to the main branch.
+- **Pull requests to `main`**: Runs when a pull request is created or updated.
 
-- **Triggers:**
-  - Runs on `push` and `pull_request` events targeting the `main` branch.
-- **Steps:**
-  1. **Checkout the Repository**
-  2. **Create the DBT `profiles.yml` file** dynamically using **GitHub Secrets**.
-  3. **Set up Python** environment.
-  4. **Install DBT** and necessary dependencies.
-  5. **Run DBT Commands:**
-     - `dbt debug`: Validates DBT connection.
-     - `dbt deps`: Installs dependencies.
-     - `dbt compile`: Compiles DBT models.
-     - `dbt run`: Executes DBT transformations.
-     - `dbt test`: Runs DBT tests.
-     - `dbt build`: Runs all models, tests, snapshots, and seeds.
+## **Jobs**
 
-## **🔹 Workflow Configuration**
-
-### **Workflow Trigger**
+### **1. Checkout Code**
 
 ```yaml
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+- name: Checkout code
+  uses: actions/checkout@v3
 ```
 
-# **📌 Scheduled DBT Jobs in GitHub Actions**
+This step pulls the latest version of the repository so that the workflow has access to the dbt project files.
 
-This document explains how **GitHub Actions** automates **DBT (Data Build Tool) workflows** using **scheduled jobs**.  
-We have **two scheduled jobs**:
+### **2. Create `profiles.yml`**
 
-1. **Daily DBT Job** (Runs every day at 5 AM UTC)
-2. **Weekly DBT Job** (Runs every Sunday at 4 AM UTC)
+```yaml
+- name: Create profiles.yml
+  run: |
+    mkdir -p ~/.dbt
+    cat > ~/.dbt/profiles.yml <<EOL
+    dbt_assignment_2:
+      outputs:
+        dev:
+          type: snowflake
+          account: "${{ secrets.DBT_ACCOUNT }}"
+          user: "${{ secrets.DBT_USER }}"
+          password: "${{ secrets.DBT_PASSWORD }}"
+          role: "${{ secrets.DBT_ROLE }}"
+          warehouse: "${{ secrets.DBT_WAREHOUSE }}"
+          database: "${{ secrets.DBT_DATABASE }}"
+          schema: "${{ secrets.DBT_SCHEMA }}"
+          threads: 4
+      target: dev
+    EOL
+```
+
+This step generates the `profiles.yml` configuration file required for dbt to connect to Snowflake. It uses GitHub Secrets to securely store credentials.
+
+### **3. Set Up Python**
+
+```yaml
+- name: Set up Python
+  uses: actions/setup-python@v4
+  with:
+    python-version: "3.10"
+```
+
+This step installs Python 3.10, which is required to run dbt.
+
+### **4. Install dbt**
+
+```yaml
+- name: Install dbt
+  run: |
+  python -m pip install --upgrade pip
+  pip install dbt-core==1.9.2 dbt-snowflake==1.9.1
+```
+
+This step installs dbt and the Snowflake adapter (`dbt-snowflake`).
+
+### **5. Run dbt Commands**
+
+```yaml
+- name: Run dbt commands
+  run: |
+    dbt debug
+    dbt deps
+    dbt compile
+    dbt run
+```
+
+This step executes the following dbt commands:
+
+- `dbt debug`: Ensures the connection to Snowflake is working.
+- `dbt deps`: Installs package dependencies.
+- `dbt compile`: Prepares SQL queries for execution.
+- `dbt run`: Executes the dbt models.
+
+### **6. Run dbt Tests**
+
+```yaml
+- name: Run dbt tests
+  run: |
+    dbt test
+```
+
+This step runs dbt tests to validate the data quality and integrity.
+
+### **7. Run dbt Build**
+
+```yaml
+- name: Run dbt build
+  run: |
+    dbt build
+```
+
+This step runs `dbt build`, which executes models, tests, snapshots, and seeds in a single command.
 
 ---
 
-## **📌 1. Daily DBT Job**
+# **Daily DBT Job**
 
-The **Daily DBT Job** ensures that **data transformations run every day** to keep reports and analytics up to date.
+## **Overview**
 
-### **🔹 Workflow Trigger**
+This **Daily DBT Job** is a GitHub Actions workflow designed to run **dbt (Data Build Tool)** processes every day at **5 AM UTC**. It automates data transformations, ensuring that data models remain up to date.
 
-- **Runs daily at 5 AM UTC**.
-- **Can also be manually triggered**.
+## **Trigger Conditions**
 
-### **🔹 Workflow Configuration**
+This job is triggered by:
+
+- A **scheduled cron job** that runs **daily at 5 AM UTC**.
+- A **manual trigger** via GitHub's workflow dispatch feature.
+
+## **Workflow Steps**
+
+### **1. Checkout Code**
 
 ```yaml
-on:
-  schedule:
-    - cron: "0 5 * * *" # Runs every day at 5 AM UTC
-  workflow_dispatch: # Allows manual trigger
+- name: Checkout code
+  uses: actions/checkout@v3
 ```
+
+Clones the repository.
+
+### **2. Run dbt Commands**
+
+```yaml
+- name: Run dbt commands
+  run: |
+    dbt debug
+    dbt deps
+    dbt compile
+    dbt run
+    dbt snapshot
+```
+
+Executes dbt commands, including `dbt snapshot` to capture historical changes.
+
+---
+
+# **Weekly DBT Job**
+
+## **Overview**
+
+This GitHub Actions workflow executes a **dbt pipeline** on a **weekly schedule** and allows manual execution when needed.
+
+## **Workflow Triggers**
+
+- **Scheduled Execution:** Runs **every Sunday at 4 AM UTC** (`cron: "0 4 * * 0"`).
+- **Manual Execution:** Can be triggered manually (`workflow_dispatch`).
+
+## **Job Steps**
+
+### **1. Checkout Code**
+
+```yaml
+- name: Checkout code
+  uses: actions/checkout@v3
+```
+
+Clones the repository.
+
+### **2. Run dbt Commands**
+
+```yaml
+- name: Run dbt commands
+  run: |
+    dbt debug
+    dbt deps
+    dbt compile
+    dbt build
+    dbt run --full-refresh
+```
+
+Executes `dbt build` and `dbt run --full-refresh` to completely refresh models weekly.
+
+## **Summary**
+
+This **Weekly DBT Job** ensures **weekly execution** of the dbt pipeline and allows manual execution when needed. It automates the setup, configuration, and execution of dbt models using **Snowflake** as the data warehouse.
