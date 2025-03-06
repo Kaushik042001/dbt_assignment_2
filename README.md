@@ -657,3 +657,87 @@ Executes `dbt build` and `dbt run --full-refresh` to completely refresh models w
 ## **Summary**
 
 This **Weekly DBT Job** ensures **weekly execution** of the dbt pipeline and allows manual execution when needed. It automates the setup, configuration, and execution of dbt models using **Snowflake** as the data warehouse.
+
+# **DBT Pre-Hooks and Post-Hooks for Execution Logging in Snowflake**
+
+## **Overview**
+
+DBT provides **pre-hooks** and **post-hooks** to execute SQL statements before and after running a model. In this implementation, these hooks log **execution details** of DBT models into a Snowflake table.
+
+## **DBT Configuration for Hooks**
+
+The following configuration in `dbt_project.yml` applies **pre-hooks** and **post-hooks** for models within the `dbt_assignment_2` project:
+
+```yaml
+models:
+  dbt_assignment_2:
+    +pre-hook:
+      - "INSERT INTO logs.execution_log (model_name, execution_time, status, run_started_at, command)
+        VALUES ('{{ this }}', CURRENT_TIMESTAMP, 'STARTED', CURRENT_TIMESTAMP, '{{ invocation_args }}')"
+
+    +post-hook:
+      - "INSERT INTO logs.execution_log (model_name, execution_time, status, run_started_at, command)
+        VALUES ('{{ this }}', CURRENT_TIMESTAMP, 'COMPLETED', CURRENT_TIMESTAMP, '{{ invocation_args }}')"
+```
+
+### **Pre-Hook Explanation**
+
+- The **pre-hook** executes before a model runs.
+- It inserts a new record into the `execution_log` table, logging:
+  - `model_name`: The name of the DBT model.
+  - `execution_time`: The current timestamp when execution starts.
+  - `status`: Set as `'STARTED'`.
+  - `run_started_at`: Timestamp of when execution begins.
+  - `command`: The DBT command that triggered the execution.
+
+### **Post-Hook Explanation**
+
+- The **post-hook** runs after the model execution finishes.
+- It logs similar details as the pre-hook but updates the **status** to `'COMPLETED'`.
+
+---
+
+## **Snowflake Table for Execution Logs**
+
+To store the logs, a table named `execution_log` is created inside the `logs` schema under `assignment_2`:
+
+```sql
+CREATE OR REPLACE SCHEMA ASSIGNMENT_2.LOGS;
+
+CREATE TABLE IF NOT EXISTS assignment_2.logs.execution_log (
+    model_name STRING,
+    execution_time TIMESTAMP,
+    status STRING,
+    run_started_at TIMESTAMP,
+    command STRING
+);
+```
+
+### **Table Structure**
+
+| Column Name      | Data Type | Description                                    |
+| ---------------- | --------- | ---------------------------------------------- |
+| `model_name`     | STRING    | Name of the DBT model executed                 |
+| `execution_time` | TIMESTAMP | Time when the log entry was recorded           |
+| `status`         | STRING    | Execution status (`STARTED` or `COMPLETED`)    |
+| `run_started_at` | TIMESTAMP | Execution start time                           |
+| `command`        | STRING    | DBT command that triggered the model execution |
+
+### **Viewing Execution Logs**
+
+To check the logs of executed models, run the following query in Snowflake:
+
+```sql
+SELECT * FROM ASSIGNMENT_2.LOGS.EXECUTION_LOG;
+```
+
+---
+
+## **Summary**
+
+- **Pre-hooks** log the start of a model execution.
+- **Post-hooks** log the completion of a model execution.
+- Logs are stored in the **`assignment_2.logs.execution_log`** table in Snowflake.
+- This setup provides a **tracking mechanism** to monitor DBT execution history efficiently.
+
+This implementation enhances **visibility, debugging, and auditing** for DBT runs in a Snowflake environment. 🚀
