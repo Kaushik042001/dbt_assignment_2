@@ -385,3 +385,155 @@ The `raw_listings_snapshot` captures changes in listing details, tracking modifi
 - `price_str` - Price per night for the listing.
 - `created_at` - Timestamp when the listing was created.
 - `updated_at` - Last update timestamp.
+
+# **DBT Incremental Model: `dim_listings_cleansed`**
+
+## **📌 Overview**
+
+This model processes raw Airbnb listings data from the `src_listings` table and performs:  
+✔ Data Cleaning (handling nulls, standardizing values)  
+✔ Price Transformation (removing non-numeric characters)  
+✔ Incremental Processing (loading only new/updated records)
+
+---
+
+## ** Incremental Strategy**
+
+This model is **incremental**, meaning:
+
+- The first run **loads all data**.
+- Subsequent runs **only process new/updated records** (based on `updated_at`).
+
+### ** Incremental Logic:**
+
+```sql
+{% if is_incremental() %}
+AND updated_at > (SELECT MAX(updated_at) FROM {{ this }})
+{% endif %}
+```
+
+# **📊 DBT Exposure: Average Nightly Rate Report**
+
+## **📌 Overview**
+
+This DBT **exposure** documents the downstream usage of the `average_nightly_rate` model in a **Looker Studio dashboard**.
+
+---
+
+## **🔹 Exposure Details**
+
+| Attribute         | Value                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| **Name**          | `average_nightly_rate_report`                                                                          |
+| **Label**         | Average Nightly Rate Report                                                                            |
+| **Type**          | Dashboard                                                                                              |
+| **Maturity**      | High                                                                                                   |
+| **Dashboard URL** | [Looker Studio Report](https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112) |
+| **Description**   | This dashboard tracks the **average nightly rate** for Airbnb listings.                                |
+| **Depends On**    | [`average_nightly_rate`](models/analytics/average_nightly_rate.sql)                                    |
+| **Owner**         | Data Team                                                                                              |
+| **Contact**       | 📧 [data-team@yourcompany.com](mailto:data-team@yourcompany.com)                                       |
+
+---
+
+## **📌 Why Use DBT Exposures?**
+
+✅ **Better Documentation:** Clearly maps the link between transformed data and its **downstream usage**.  
+✅ **Data Lineage:** Shows dependencies between **DBT models** and external tools (**e.g., dashboards**).  
+✅ **Improved Collaboration:** Helps **BI teams** understand where their data originates.
+
+---
+
+## **📌 How to Add More Exposures?**
+
+To document additional dashboards or reports, add new entries to your **`schema.yml`** under the `exposures` section:
+
+```yaml
+exposures:
+  - name: <exposure_name>
+    label: "<Descriptive Label>"
+    type: dashboard
+    maturity: <low/medium/high>
+    url: "<dashboard_url>"
+    description: "<What this dashboard/report does>"
+    depends_on:
+      - ref('<dbt_model_name>')
+    owner:
+      name: "<Team or Owner>"
+      email: "<Contact Email>"
+```
+
+# **🚀 DBT Automation with GitHub Actions**
+
+This repository contains **GitHub Actions workflows** for automating **DBT (Data Build Tool) execution**.  
+The workflows ensure **continuous integration (CI/CD), scheduled daily execution, and weekly execution** for DBT models.
+
+---
+
+# **📌 1. CI/CD Pipeline for DBT**
+
+## **🔹 Overview**
+
+This **CI/CD pipeline** triggers **DBT execution** whenever:
+
+- A **push** is made to the `main` branch.
+- A **pull request** is opened or updated on the `main` branch.
+
+## **🔹 Workflow Summary**
+
+- **Triggers:**
+  - Runs on `push` and `pull_request` events targeting the `main` branch.
+- **Steps:**
+  1. **Checkout the Repository**
+  2. **Create the DBT `profiles.yml` file** dynamically using **GitHub Secrets**.
+  3. **Set up Python** environment.
+  4. **Install DBT** and necessary dependencies.
+  5. **Run DBT Commands:**
+     - `dbt debug`: Validates DBT connection.
+     - `dbt deps`: Installs dependencies.
+     - `dbt compile`: Compiles DBT models.
+     - `dbt run`: Executes DBT transformations.
+     - `dbt test`: Runs DBT tests.
+     - `dbt build`: Runs all models, tests, snapshots, and seeds.
+
+## **🔹 Workflow Configuration**
+
+### **Workflow Trigger**
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+```
+
+# **📌 Scheduled DBT Jobs in GitHub Actions**
+
+This document explains how **GitHub Actions** automates **DBT (Data Build Tool) workflows** using **scheduled jobs**.  
+We have **two scheduled jobs**:
+
+1. **Daily DBT Job** (Runs every day at 5 AM UTC)
+2. **Weekly DBT Job** (Runs every Sunday at 4 AM UTC)
+
+---
+
+## **📌 1. Daily DBT Job**
+
+The **Daily DBT Job** ensures that **data transformations run every day** to keep reports and analytics up to date.
+
+### **🔹 Workflow Trigger**
+
+- **Runs daily at 5 AM UTC**.
+- **Can also be manually triggered**.
+
+### **🔹 Workflow Configuration**
+
+```yaml
+on:
+  schedule:
+    - cron: "0 5 * * *" # Runs every day at 5 AM UTC
+  workflow_dispatch: # Allows manual trigger
+```

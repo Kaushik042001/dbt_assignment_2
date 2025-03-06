@@ -28,11 +28,14 @@ WITH raw_listings AS (
     AND price_str IS NOT NULL  -- Remove rows where price_str is null
     AND price_str != ''        -- Remove empty strings
 
-    {% if is_incremental() %} 
-    AND updated_at > (select max(updated_at) from {{ this }}) 
-    {% endif %}
+
 ) 
 
 
-SELECT * FROM raw_listings
+SELECT * FROM raw_listings 
+WHERE 1=1
+
+{% if is_incremental() %} 
+    AND updated_at > (select max(updated_at) from {{ this }}) 
+    {% endif %}
 

@@ -8,29 +8,5 @@ exposures:
     depends_on:
       - ref('average_nightly_rate')
     owner:
-      name: "Data Team"
-      email: "data-team@yourcompany.com"
-
-  - name: count_available_days_report
-    label: "Count of Available Days Report"
-    type: dashboard
-    maturity: high
-    url: "https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112"
-    description: "This dashboard shows the count of available days for listings."
-    depends_on:
-      - ref('count_available_days')
-    owner:
-      name: "Data Team"
-      email: "data-team@yourcompany.com"
-
-  - name: final_airbnb_listings_dashboard
-    label: "Final Airbnb Listings Dashboard"
-    type: dashboard
-    maturity: high
-    url: "https://lookerstudio.google.com/reporting/8b2cf0ba-74f6-4db5-abb7-d35575650112"
-    description: "This dashboard provides an overview of Airbnb listings with all final transformations applied."
-    depends_on:
-      - ref('final_airbnb_listings')
-    owner:
-      name: "Data Team"
-      email: "data-team@yourcompany.com"
+      name: "Kaushik Chari"
+      email: "charikaushik29@gmail.com.com"
