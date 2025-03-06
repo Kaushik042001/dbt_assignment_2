@@ -50,11 +50,6 @@ jobs:
           dbt debug
           dbt deps
           dbt compile
-          dbt run
-
-      - name: Run dbt tests
-        run: |
-          dbt test
 
       - name: Run dbt build
         run: |

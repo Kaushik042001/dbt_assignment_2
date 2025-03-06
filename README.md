@@ -547,7 +547,6 @@ This step installs dbt and the Snowflake adapter (`dbt-snowflake`).
     dbt debug
     dbt deps
     dbt compile
-    dbt run
 ```
 
 This step executes the following dbt commands:
@@ -557,12 +556,12 @@ This step executes the following dbt commands:
 - `dbt compile`: Prepares SQL queries for execution.
 - `dbt run`: Executes the dbt models.
 
-### **6. Run dbt Tests**
+### **6. Run dbt build**
 
 ```yaml
-- name: Run dbt tests
+- name: Run dbt build
   run: |
-    dbt test
+    dbt build
 ```
 
 This step runs dbt tests to validate the data quality and integrity.
@@ -611,7 +610,7 @@ Clones the repository.
     dbt debug
     dbt deps
     dbt compile
-    dbt run
+    dbt build
     dbt snapshot
 ```
 
